@@ -1,6 +1,6 @@
 # TripOS - Premium AI Travel SaaS
 
-This project is a high-fidelity frontend implementation of TripOS, an AI-powered travel planning platform. It features a premium "Antigravity" design aesthetic with glassmorphism, smooth animations, and a dark futuristic theme.
+This project is a high-fidelity frontend implementation of TripOS, an AI-powered travel planning platform. It features a premium  design aesthetic with glassmorphism, smooth animations, and a dark futuristic theme.
 
 ## Tech Stack
 - **Framework**: React + Vite
