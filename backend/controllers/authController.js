@@ -82,19 +82,24 @@ export const refresh = asyncHandler(async (req, res) => {
         throw new Error('Refresh token required');
     }
 
-    const decoded = jwt.verify(
-        refreshToken,
-        process.env.JWT_REFRESH_SECRET
-    );
-    const user = await User.findById(decoded.id);
+    try {
+        const decoded = jwt.verify(
+            refreshToken,
+            process.env.JWT_REFRESH_SECRET
+        );
+        const user = await User.findById(decoded.id);
 
-    if (!user) {
+        if (!user) {
+            res.status(401);
+            throw new Error('Invalid refresh token');
+        }
+
+        const token = generateAccessToken(user._id);
+        res.json({ success: true, data: { token }, token });
+    } catch (err) {
         res.status(401);
-        throw new Error('Invalid refresh token');
+        throw new Error('Refresh token expired or invalid');
     }
-
-    const token = generateAccessToken(user._id);
-    res.json({ success: true, data: { token }, token });
 });
 
 /**

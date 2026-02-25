@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import Trip from '../models/Trip.js';
-import { generateItinerary } from '../services/openai.service.js';
-import { getPlaceDetails } from '../services/maps.service.js';
+import { generateItinerary } from '../services/openaiService.js';
+import { getPlaceDetails } from '../services/mapsService.js';
 
 // @desc    Create a new trip
 // @route   POST /api/trips
@@ -146,14 +146,20 @@ export const addTripActivity = asyncHandler(async (req, res) => {
 // @route   POST /api/trips/generate
 // @access  Private
 export const aiGenerateTrip = asyncHandler(async (req, res) => {
-    const { destination, days, budget, style } = req.body;
+    const { destination, days, budget, style, travelStyle } = req.body;
 
-    const generatedPlan = await generateItinerary({
+    const itinerary = await generateItinerary({
         destination,
         days,
         budget,
-        style,
+        travelStyle: travelStyle || style || 'moderate',
+        currency: req.user?.preferences?.currency || 'INR',
     });
 
-    res.json(generatedPlan);
+    res.json({
+        success: true,
+        data: {
+            itinerary,
+        },
+    });
 });
