@@ -1,20 +1,32 @@
 import React, { useState } from 'react';
-import { Bell, Shield, Globe, CreditCard, Moon, Smartphone, ChevronRight, LogOut, CheckCircle, DollarSign } from 'lucide-react';
+import { Bell, Shield, Globe, CreditCard, Moon, Smartphone, ChevronRight, LogOut, DollarSign } from 'lucide-react';
 import Card from '../components/ui/Card';
-import Badge from '../components/ui/Badge'; // Corrected import path (was missing ..)
 import Button from '../components/ui/Button';
-import { cn } from '../lib/utils'; // Corrected import path
+import { cn } from '../lib/utils';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+    const toast = useToast();
+
     const [notifications, setNotifications] = useState(true);
     const [darkMode, setDarkMode] = useState(true);
     const [currency, setCurrency] = useState('INR (₹)');
 
     const toggleCurrency = () => {
         const currencies = ['INR (₹)', 'USD ($)', 'EUR (€)', 'GBP (£)'];
-        const currentIndex = currencies.indexOf(currency);
-        const nextIndex = (currentIndex + 1) % currencies.length;
-        setCurrency(currencies[nextIndex]);
+        const next = currencies[(currencies.indexOf(currency) + 1) % currencies.length];
+        setCurrency(next);
+        toast.success(`Currency changed to ${next}`);
+    };
+
+    const handleLogout = () => {
+        logout();
+        toast.success('Signed out successfully.');
+        navigate('/');
     };
 
     const sections = [
@@ -28,7 +40,7 @@ const Settings = () => {
         {
             title: 'Preferences',
             items: [
-                { icon: Globe, label: 'Language', value: 'English (US)' },
+                { icon: Globe, label: 'Language', value: 'English (India)' },
                 { icon: DollarSign, label: 'Currency', value: currency, action: toggleCurrency },
                 { icon: Moon, label: 'Dark Mode', toggle: true, state: darkMode, setState: setDarkMode },
                 { icon: Bell, label: 'Notifications', toggle: true, state: notifications, setState: setNotifications },
@@ -58,11 +70,11 @@ const Settings = () => {
                                     onClick={() => {
                                         if (item.toggle) {
                                             item.setState(!item.state);
+                                            toast.info(`${item.label} ${!item.state ? 'enabled' : 'disabled'}`);
                                         } else if (item.action) {
                                             item.action();
                                         } else {
-                                            if (item.label === 'Sign Out') return;
-                                            alert(`Navigating to ${item.label} settings...`);
+                                            toast.info(`${item.label} settings coming soon!`);
                                         }
                                     }}
                                 >
@@ -77,16 +89,9 @@ const Settings = () => {
 
                                     <div className="flex items-center gap-3">
                                         {item.value && <span className="text-sm text-text-secondary">{item.value}</span>}
-
                                         {item.toggle ? (
-                                            <div className={cn(
-                                                "w-11 h-6 rounded-full transition-colors relative",
-                                                item.state ? "bg-cyan-500" : "bg-bg-dark border border-white/10"
-                                            )}>
-                                                <div className={cn(
-                                                    "absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 shadow-sm",
-                                                    item.state ? "translate-x-5" : "translate-x-0"
-                                                )} />
+                                            <div className={cn("w-11 h-6 rounded-full transition-colors relative", item.state ? "bg-cyan-500" : "bg-bg-dark border border-white/10")}>
+                                                <div className={cn("absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 shadow-sm", item.state ? "translate-x-5" : "translate-x-0")} />
                                             </div>
                                         ) : (
                                             <ChevronRight size={18} className="text-text-secondary group-hover:text-white" />
@@ -103,13 +108,13 @@ const Settings = () => {
                 <Button
                     variant="danger"
                     className="w-full flex items-center justify-center gap-2"
-                    onClick={() => window.location.href = '/'}
+                    onClick={handleLogout}
                 >
                     <LogOut size={18} />
                     Sign Out
                 </Button>
                 <p className="text-center text-xs text-text-secondary mt-4">
-                    TripOS v1.0.0 • Build 2024.10.12
+                    TripOS v1.0.0 • © 2025 TripOS Technologies Pvt. Ltd.
                 </p>
             </div>
         </div>

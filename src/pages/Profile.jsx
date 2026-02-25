@@ -6,15 +6,21 @@ import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
 import { cn } from '../lib/utils';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
 
 const Profile = () => {
+    const { user: authUser, logout } = useAuth();
+    const navigate = useNavigate();
+    const toast = useToast();
+
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [user, setUser] = useState({
-        name: 'Alex Morgan',
+        name: authUser?.name || 'Traveler',
         role: 'Pro Traveler',
-        location: 'San Francisco, CA',
-        avatar: 'https://photos.google.com/photo/AF1QipNcP-l_h_WxPmhMfxUuYfzFMmEqijcIiiSUaAMG',
+        location: 'India',
+        avatar: authUser?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(authUser?.name || 'T')}&background=0ea5e9&color=fff&size=200`,
         stats: [
             { label: 'Trips', value: '47', icon: MapPin, color: 'text-blue-400' },
             { label: 'Countries', value: '12', icon: Globe, color: 'text-cyan-400' },
@@ -33,6 +39,7 @@ const Profile = () => {
         e.preventDefault();
         setUser(tempUser);
         setIsEditModalOpen(false);
+        toast.success('Profile updated successfully!');
     };
 
     const handleStatChange = (index, value) => {
@@ -41,10 +48,16 @@ const Profile = () => {
         setTempUser({ ...tempUser, stats: newStats });
     };
 
+    const handleLogout = () => {
+        logout();
+        toast.success('Signed out. See you next time!');
+        navigate('/');
+    };
+
     const recentTrips = [
-        { id: 1, title: 'Tokyo Adventure', dates: 'Oct 12 - Oct 17', status: 'Upcoming', image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-        { id: 2, title: 'Paris Escape', dates: 'Aug 05 - Aug 10', status: 'Completed', image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-        { id: 3, title: 'Iceland Roadtrip', dates: 'Jun 15 - Jun 25', status: 'Completed', image: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+        { id: 1, title: 'Kerala Backwaters', dates: 'Oct 12 - Oct 17', status: 'Upcoming', image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+        { id: 2, title: 'Rajasthan Royal Tour', dates: 'Aug 05 - Aug 10', status: 'Completed', image: 'https://images.unsplash.com/photo-1477587458883-47145ed31d3a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+        { id: 3, title: 'Manali Snow Trek', dates: 'Jun 15 - Jun 25', status: 'Completed', image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
     ];
 
     return (
@@ -86,6 +99,12 @@ const Profile = () => {
                             <span>{user.location}</span>
                             <span className="mx-2">•</span>
                             <Badge variant="primary">{user.role}</Badge>
+                            {authUser?.email && (
+                                <>
+                                    <span className="mx-2">•</span>
+                                    <span className="text-xs">{authUser.email}</span>
+                                </>
+                            )}
                         </div>
                     </div>
 
@@ -98,38 +117,13 @@ const Profile = () => {
             </div>
 
             {/* Edit Profile Modal */}
-            <Modal
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-                title="Edit Profile"
-            >
+            <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Profile">
                 <form onSubmit={handleSaveProfile} className="space-y-6">
                     <div className="space-y-4">
-                        <Input
-                            label="DISPLAY NAME"
-                            value={tempUser.name}
-                            onChange={(e) => setTempUser({ ...tempUser, name: e.target.value })}
-                            placeholder="Your Name"
-                        />
-                        <Input
-                            label="ROLE / TITLE"
-                            value={tempUser.role}
-                            onChange={(e) => setTempUser({ ...tempUser, role: e.target.value })}
-                            placeholder="e.g. Pro Traveler"
-                        />
-                        <Input
-                            label="LOCATION"
-                            value={tempUser.location}
-                            onChange={(e) => setTempUser({ ...tempUser, location: e.target.value })}
-                            placeholder="e.g. San Francisco, CA"
-                        />
-                        <Input
-                            label="PROFILE IMAGE URL"
-                            value={tempUser.avatar}
-                            onChange={(e) => setTempUser({ ...tempUser, avatar: e.target.value })}
-                            placeholder="https://..."
-                        />
-
+                        <Input label="DISPLAY NAME" value={tempUser.name} onChange={(e) => setTempUser({ ...tempUser, name: e.target.value })} placeholder="Your Name" />
+                        <Input label="ROLE / TITLE" value={tempUser.role} onChange={(e) => setTempUser({ ...tempUser, role: e.target.value })} placeholder="e.g. Pro Traveler" />
+                        <Input label="LOCATION" value={tempUser.location} onChange={(e) => setTempUser({ ...tempUser, location: e.target.value })} placeholder="e.g. Mumbai, India" />
+                        <Input label="PROFILE IMAGE URL" value={tempUser.avatar} onChange={(e) => setTempUser({ ...tempUser, avatar: e.target.value })} placeholder="https://..." />
                         <div className="pt-2">
                             <label className="text-xs font-medium text-text-secondary ml-1 mb-2 block">STATS</label>
                             <div className="grid grid-cols-3 gap-3">
@@ -147,11 +141,8 @@ const Profile = () => {
                             </div>
                         </div>
                     </div>
-
                     <div className="pt-2">
-                        <Button type="submit" className="w-full shadow-glow">
-                            Save Changes
-                        </Button>
+                        <Button type="submit" className="w-full shadow-glow">Save Changes</Button>
                     </div>
                 </form>
             </Modal>
@@ -161,20 +152,11 @@ const Profile = () => {
                 {user.stats.map((stat, index) => (
                     <Card key={index} className="flex flex-col items-center justify-center p-8 bg-bg-dark/40 border-white/5 hover:border-white/10 transition-all group overflow-hidden relative">
                         <div className="relative mb-4 flex items-center justify-center">
-                            {/* Centered Background Glow */}
-                            <div className={cn(
-                                "absolute w-16 h-16 blur-[30px] opacity-20 group-hover:opacity-40 transition-opacity rounded-full",
-                                stat.color.replace('text-', 'bg-')
-                            )} />
-
-                            <div className={cn(
-                                "w-14 h-14 flex items-center justify-center rounded-2xl bg-white/5 relative z-10 group-hover:scale-110 transition-transform duration-500",
-                                stat.color
-                            )}>
+                            <div className={cn("absolute w-16 h-16 blur-[30px] opacity-20 group-hover:opacity-40 transition-opacity rounded-full", stat.color.replace('text-', 'bg-'))} />
+                            <div className={cn("w-14 h-14 flex items-center justify-center rounded-2xl bg-white/5 relative z-10 group-hover:scale-110 transition-transform duration-500", stat.color)}>
                                 <stat.icon size={28} strokeWidth={1.5} />
                             </div>
                         </div>
-
                         <div className="text-center relative z-10">
                             <p className="text-4xl font-bold text-white tracking-tight mb-1">{stat.value}</p>
                             <p className="text-[11px] uppercase tracking-[0.2em] text-text-secondary font-semibold">{stat.label}</p>
@@ -189,11 +171,7 @@ const Profile = () => {
                 <div className="space-y-4">
                     {recentTrips.map((trip) => (
                         <Card key={trip.id} hover className="flex items-center gap-4 p-4 group cursor-pointer">
-                            <img
-                                src={trip.image}
-                                alt={trip.title}
-                                className="w-16 h-16 rounded-xl object-cover transition-transform duration-300 group-hover:scale-110"
-                            />
+                            <img src={trip.image} alt={trip.title} className="w-16 h-16 rounded-xl object-cover transition-transform duration-300 group-hover:scale-110" />
                             <div className="flex-1">
                                 <h3 className="font-semibold text-white group-hover:text-cyan-400 transition-colors">{trip.title}</h3>
                                 <p className="text-sm text-text-secondary">{trip.dates}</p>
@@ -210,7 +188,10 @@ const Profile = () => {
             </div>
 
             <div className="pt-4 border-t border-white/5">
-                <button className="w-full flex items-center justify-center gap-2 p-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors font-medium">
+                <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center gap-2 p-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors font-medium"
+                >
                     <LogOut size={20} />
                     Sign Out
                 </button>

@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Calendar, Users, DollarSign, Zap, Clock, Info, Sparkles, Minus, Plus } from 'lucide-react';
+import { MapPin, Calendar, Users, Zap, Clock, Info, Sparkles, Minus, Plus } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import Badge from '../components/ui/Badge';
 import { cn } from '../lib/utils';
+import { useToast } from '../context/ToastContext.jsx';
 
 const NewJourney = () => {
     const navigate = useNavigate();
+    const toast = useToast();
     const [budget, setBudget] = useState('standard');
     const [pace, setPace] = useState('normal');
     const [travelers, setTravelers] = useState(2);
     const [days, setDays] = useState(7);
+    const [destination, setDestination] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
     const [aiFeatures, setAiFeatures] = useState({ scheduling: true, gems: false });
 
     const toggleFeature = (feature) => {
@@ -20,7 +24,16 @@ const NewJourney = () => {
     };
 
     const handleGenerate = () => {
-        navigate('/timeline');
+        if (!destination.trim()) {
+            toast.error('Please enter a destination to continue.');
+            return;
+        }
+        setIsGenerating(true);
+        toast.info(`Building your ${days}-day ${destination} itinerary…`);
+        setTimeout(() => {
+            setIsGenerating(false);
+            navigate('/timeline');
+        }, 1800);
     };
 
     return (
@@ -40,9 +53,11 @@ const NewJourney = () => {
                             icon={MapPin}
                             placeholder="Search cities (e.g. Goa, Manali)..."
                             className="bg-bg-dark/50"
+                            value={destination}
+                            onChange={e => setDestination(e.target.value)}
                         />
                         <Input
-                            icon={Zap} // Just a placeholder icon for area
+                            icon={Zap}
                             placeholder="Specific area (Optional)"
                             className="bg-bg-dark/50"
                         />
@@ -55,6 +70,8 @@ const NewJourney = () => {
                             icon={Calendar}
                             type="date"
                             className="bg-bg-dark/50"
+                            value={startDate}
+                            onChange={e => setStartDate(e.target.value)}
                         />
 
                         <div className="grid grid-cols-2 gap-4">
@@ -231,13 +248,13 @@ const NewJourney = () => {
                 </div>
 
                 <div className="pt-4">
-                    <Button onClick={handleGenerate} className="w-full py-4 text-lg font-semibold shadow-glow group">
+                    <Button onClick={handleGenerate} isLoading={isGenerating} className="w-full py-4 text-lg font-semibold shadow-glow group">
                         <Sparkles className="mr-2 group-hover:animate-spin" size={20} />
-                        Generate Realistic Trip Plan
+                        {isGenerating ? 'Generating…' : 'Generate Trip Plan'}
                     </Button>
                     <p className="text-center text-xs text-text-secondary mt-4 flex items-center justify-center gap-1">
                         <Info size={12} />
-                        AI generates plans based on real-time data
+                        Destination is required to generate a plan
                     </p>
                 </div>
 

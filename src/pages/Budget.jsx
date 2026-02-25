@@ -5,10 +5,17 @@ import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
+import Skeleton from '../components/ui/Skeleton';
 import { cn } from '../lib/utils';
 
 const Budget = () => {
+    const [isLoading, setIsLoading] = useState(true);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+    React.useEffect(() => {
+        const timer = setTimeout(() => setIsLoading(false), 1200);
+        return () => clearTimeout(timer);
+    }, []);
     const [showAllCategories, setShowAllCategories] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -129,37 +136,53 @@ const Budget = () => {
             </div>
 
             {/* Main Budget Card */}
-            <Card className="bg-gradient-to-br from-bg-card/80 to-bg-dark/80 border-cyan-500/20 shadow-glow">
-                <div className="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-6">
-                    <div className="space-y-1">
-                        <span className="text-sm text-text-secondary">Total Budget</span>
-                        <div className="text-4xl font-bold text-white tracking-tight">
-                            ₹{totalBudget.toLocaleString()}
+            {isLoading ? (
+                <Card className="space-y-6">
+                    <div className="flex justify-between items-end">
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-10 w-40" />
                         </div>
+                        <Skeleton className="h-6 w-24 rounded-full" />
                     </div>
-                    <Badge variant="primary" className="self-start md:self-auto bg-blue-500/20 text-blue-300 px-3 py-1">
-                        {Math.round(percentage)}% Spent
-                    </Badge>
-                </div>
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full rounded-full" />
+                    </div>
+                </Card>
+            ) : (
+                <Card className="bg-gradient-to-br from-bg-card/80 to-bg-dark/80 border-cyan-500/20 shadow-glow">
+                    <div className="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-6">
+                        <div className="space-y-1">
+                            <span className="text-sm text-text-secondary">Total Budget</span>
+                            <div className="text-4xl font-bold text-white tracking-tight">
+                                ₹{totalBudget.toLocaleString()}
+                            </div>
+                        </div>
+                        <Badge variant="primary" className="self-start md:self-auto bg-blue-500/20 text-blue-300 px-3 py-1">
+                            {Math.round(percentage)}% Spent
+                        </Badge>
+                    </div>
 
-                <div className="space-y-2">
-                    <div className="flex justify-between text-sm font-medium">
-                        <span className="text-text-secondary">Spent: <span className="text-white">₹{spent.toLocaleString()}</span></span>
-                        <span className="text-text-secondary">Remaining: <span className={cn(remaining < 0 ? "text-red-400" : "text-emerald-400")}>₹{remaining.toLocaleString()}</span></span>
-                    </div>
-                    <div className="h-4 bg-bg-dark rounded-full overflow-hidden border border-white/5 relative">
-                        <div
-                            className={cn(
-                                "h-full rounded-full transition-all duration-1000 ease-out relative",
-                                percentage > 90 ? "bg-gradient-to-r from-orange-500 to-red-500" : "bg-gradient-to-r from-blue-600 to-cyan-400"
-                            )}
-                            style={{ width: `${percentage}%` }}
-                        >
-                            <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/50 blur-[2px]"></div>
+                    <div className="space-y-2">
+                        <div className="flex justify-between text-sm font-medium">
+                            <span className="text-text-secondary">Spent: <span className="text-white">₹{spent.toLocaleString()}</span></span>
+                            <span className="text-text-secondary">Remaining: <span className={cn(remaining < 0 ? "text-red-400" : "text-emerald-400")}>₹{remaining.toLocaleString()}</span></span>
+                        </div>
+                        <div className="h-4 bg-bg-dark rounded-full overflow-hidden border border-white/5 relative">
+                            <div
+                                className={cn(
+                                    "h-full rounded-full transition-all duration-1000 ease-out relative",
+                                    percentage > 90 ? "bg-gradient-to-r from-orange-500 to-red-500" : "bg-gradient-to-r from-blue-600 to-cyan-400"
+                                )}
+                                style={{ width: `${percentage}%` }}
+                            >
+                                <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/50 blur-[2px]"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </Card>
+                </Card>
+            )}
 
             {/* Categories Grid */}
             <div>
@@ -174,41 +197,56 @@ const Budget = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {displayedCategories.map((cat) => (
-                        <Card key={cat.id} hover className="flex flex-col gap-4 animate-fade-in relative group">
-                            <div className="flex items-start justify-between">
+                    {isLoading ? (
+                        [1, 2, 3, 4].map(i => (
+                            <Card key={i} className="p-4 space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <div className={cn("p-2.5 rounded-xl bg-white/5", cat.color.replace('bg-', 'text-'))}>
-                                        <cat.icon size={20} />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-white">{cat.name}</h3>
-                                        <p className="text-xs text-text-secondary">₹{cat.spent.toLocaleString()} of ₹{cat.budget.toLocaleString()}</p>
+                                    <Skeleton className="w-10 h-10 rounded-xl" />
+                                    <div className="flex-1 space-y-2">
+                                        <Skeleton className="h-4 w-1/3" />
+                                        <Skeleton className="h-3 w-1/2" />
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-sm font-medium text-text-secondary">{Math.round((cat.spent / cat.budget) * 100)}%</span>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeleteCategory(cat.id);
-                                        }}
-                                        className="p-1.5 rounded-lg text-text-secondary hover:text-red-400 hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-all"
-                                        title="Delete Category"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
+                                <Skeleton className="h-1.5 w-full rounded-full" />
+                            </Card>
+                        ))
+                    ) : (
+                        displayedCategories.map((cat) => (
+                            <Card key={cat.id} hover className="flex flex-col gap-4 animate-fade-in relative group">
+                                <div className="flex items-start justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className={cn("p-2.5 rounded-xl bg-white/5", cat.color.replace('bg-', 'text-'))}>
+                                            <cat.icon size={20} />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-semibold text-white">{cat.name}</h3>
+                                            <p className="text-xs text-text-secondary">₹{cat.spent.toLocaleString()} of ₹{cat.budget.toLocaleString()}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-sm font-medium text-text-secondary">{Math.round((cat.spent / cat.budget) * 100)}%</span>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteCategory(cat.id);
+                                            }}
+                                            className="p-1.5 rounded-lg text-text-secondary hover:text-red-400 hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-all"
+                                            title="Delete Category"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="h-1.5 bg-bg-dark rounded-full overflow-hidden">
-                                <div
-                                    className={cn("h-full rounded-full transition-all duration-1000", cat.color)}
-                                    style={{ width: `${Math.min((cat.spent / cat.budget) * 100, 100)}%` }}
-                                />
-                            </div>
-                        </Card>
-                    ))}
+                                <div className="h-1.5 bg-bg-dark rounded-full overflow-hidden">
+                                    <div
+                                        className={cn("h-full rounded-full transition-all duration-1000", cat.color)}
+                                        style={{ width: `${Math.min((cat.spent / cat.budget) * 100, 100)}%` }}
+                                    />
+                                </div>
+                            </Card>
+                        ))
+                    )}
                 </div>
             </div>
 

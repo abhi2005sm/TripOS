@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 import Card from './Card';
 
 const Modal = ({ isOpen, onClose, title, children, className }) => {
