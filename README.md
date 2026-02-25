@@ -1,6 +1,10 @@
 # TripOS — The Premium AI Travel Operating System
 
+<<<<<<< HEAD
 TripOS is a state-of-the-art, production-grade travel planning platform. Designed for modern explorers, it combines a **luxury aesthetic** with a robust, **hardened backend** to provide scientific precision in itinerary generation and budget management.
+=======
+This project is a high-fidelity frontend implementation of TripOS, an AI-powered travel planning platform. It features a premium  design aesthetic with glassmorphism, smooth animations, and a dark futuristic theme.
+>>>>>>> 505e7c286950ee4bfd8eb5a2a9bb4a98e0fa1928
 
 ![TripOS Hero](https://github.com/user-attachments/assets/7e7e6e5a-4e4c-4e4f-b1e1-1a2b3c4d5e6f) *Note: Replace with actual asset link if available*
 
